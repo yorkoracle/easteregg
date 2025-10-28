@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Easter Egg</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: #1e1e1e;
+        color: #f1c40f;
+        font-family: 'Arial', sans-serif;
+        text-align: center;
+        overflow: hidden;
+    }
+    h1 {
+        font-size: 3rem;
+        margin: 0.5rem;
+    }
+    h2 {
+        font-size: 1.5rem;
+        margin: 0.5rem;
+        color: #ffffff;
+    }
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+</style>
+</head>
+<body>
+<h1>You found Phil!</h1>
+<h2>Phil is hidden in many articles!</h2>
+<canvas id="confetti"></canvas>
+<script>
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const confettiCount = 200;
+const confetti = [];
+
+class Confetto {
+    constructor() {
+        this.reset();
+    }
+    reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * -canvas.height;
+        this.size = Math.random() * 10 + 5;
+        this.speedY = Math.random() * 3 + 2;
+        this.speedX = Math.random() * 2 - 1;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 10 - 5;
+        this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        this.shape = Math.random() > 0.5 ? 'triangle' : 'rect';
+    }
+    update() {
+        this.y += this.speedY;
+        this.x += this.speedX + Math.sin(this.y * 0.05) * 2;
+        this.rotation += this.rotationSpeed;
+        if (this.y > canvas.height) this.reset();
+    }
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        ctx.fillStyle = this.color;
+        if (this.shape === 'triangle') {
+            ctx.beginPath();
+            ctx.moveTo(0, -this.size / 2);
+            ctx.lineTo(this.size / 2, this.size / 2);
+            ctx.lineTo(-this.size / 2, this.size / 2);
+            ctx.closePath();
+            ctx.fill();
+        } else {
+            ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+        }
+        ctx.restore();
+    }
+}
+
+for (let i = 0; i < confettiCount; i++) {
+    confetti.push(new Confetto());
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+        c.update();
+        c.draw();
+    });
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+</body>
+</html>
